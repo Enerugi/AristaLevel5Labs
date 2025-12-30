@@ -52,16 +52,6 @@ ethernet_interfaces:
   peer_type: spine
   switchport:
     enabled: false
-- name: Ethernet6
-  description: P2P_spine4_Ethernet3
-  shutdown: false
-  mtu: 1550
-  ip_address: 192.168.103.7/31
-  peer: spine4
-  peer_interface: Ethernet3
-  peer_type: spine
-  switchport:
-    enabled: false
 - name: Ethernet7
   description: SERVER_host1_Ethernet1
   shutdown: false
@@ -214,11 +204,6 @@ router_bgp:
     remote_as: '65001'
     peer: spine3
     description: spine3_Ethernet3
-  - ip_address: 192.168.103.6
-    peer_group: IPv4-UNDERLAY-PEERS
-    remote_as: '65001'
-    peer: spine4
-    description: spine4_Ethernet3
   - ip_address: 192.168.101.11
     peer_group: EVPN-OVERLAY-PEERS
     remote_as: '65001'
@@ -234,11 +219,6 @@ router_bgp:
     remote_as: '65001'
     peer: spine3
     description: spine3_Loopback0
-  - ip_address: 192.168.101.14
-    peer_group: EVPN-OVERLAY-PEERS
-    remote_as: '65001'
-    peer: spine4
-    description: spine4_Loopback0
   redistribute:
     connected:
       enabled: true
@@ -250,14 +230,6 @@ router_bgp:
     route_targets:
       both:
       - 10010:10010
-    redistribute_routes:
-    - learned
-  - id: 20
-    tenant: ACME
-    rd: 192.168.101.1:10020
-    route_targets:
-      both:
-      - 10020:10020
     redistribute_routes:
     - learned
   address_family_evpn:
@@ -323,12 +295,6 @@ vlan_interfaces:
   vrf: VRF_A
   ip_address_virtual: 10.1.10.1/24
   tenant: ACME
-- name: Vlan20
-  description: Internal
-  shutdown: false
-  vrf: VRF_A
-  ip_address_virtual: 10.1.20.1/24
-  tenant: ACME
 - name: Vlan3009
   description: MLAG_L3_VRF_VRF_A
   shutdown: false
@@ -356,9 +322,6 @@ vlans:
 - id: 10
   name: DMZ
   tenant: ACME
-- id: 20
-  name: Internal
-  tenant: ACME
 - id: 3009
   name: MLAG_L3_VRF_VRF_A
   trunk_groups:
@@ -380,8 +343,6 @@ vxlan_interface:
       vlans:
       - id: 10
         vni: 10010
-      - id: 20
-        vni: 10020
       vrfs:
       - name: VRF_A
         vni: 10

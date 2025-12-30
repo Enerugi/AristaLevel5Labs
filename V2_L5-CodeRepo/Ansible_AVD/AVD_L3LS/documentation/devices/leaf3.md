@@ -186,7 +186,6 @@ vlan internal order ascending range 1006 1199
 | VLAN ID | Name | Trunk Groups |
 | ------- | ---- | ------------ |
 | 10 | DMZ | - |
-| 20 | Internal | - |
 | 3009 | MLAG_L3_VRF_VRF_A | MLAG |
 | 4093 | MLAG_L3 | MLAG |
 | 4094 | MLAG | MLAG |
@@ -197,9 +196,6 @@ vlan internal order ascending range 1006 1199
 !
 vlan 10
    name DMZ
-!
-vlan 20
-   name Internal
 !
 vlan 3009
    name MLAG_L3_VRF_VRF_A
@@ -226,7 +222,6 @@ vlan 4094
 | --------- | ----------- | ---- | ----- | ----------- | ----------- | ------------- |
 | Ethernet1 | MLAG_leaf4_Ethernet1 | *trunk | *- | *- | *MLAG | 1 |
 | Ethernet2 | MLAG_leaf4_Ethernet2 | *trunk | *- | *- | *MLAG | 1 |
-| Ethernet7 | SERVER_host3_Ethernet1 | *access | *20 | *- | *- | 7 |
 
 *Inherited from Port-Channel Interface
 
@@ -234,10 +229,9 @@ vlan 4094
 
 | Interface | Description | Channel Group | IP Address | VRF |  MTU | Shutdown | ACL In | ACL Out |
 | --------- | ----------- | ------------- | ---------- | ----| ---- | -------- | ------ | ------- |
-| Ethernet3 | P2P_spine1_Ethernet5 | - | 192.168.103.17/31 | default | 1550 | False | - | - |
-| Ethernet4 | P2P_spine2_Ethernet5 | - | 192.168.103.19/31 | default | 1550 | False | - | - |
-| Ethernet5 | P2P_spine3_Ethernet5 | - | 192.168.103.21/31 | default | 1550 | False | - | - |
-| Ethernet6 | P2P_spine4_Ethernet5 | - | 192.168.103.23/31 | default | 1550 | False | - | - |
+| Ethernet3 | P2P_spine1_Ethernet5 | - | 192.168.103.13/31 | default | 1550 | False | - | - |
+| Ethernet4 | P2P_spine2_Ethernet5 | - | 192.168.103.15/31 | default | 1550 | False | - | - |
+| Ethernet5 | P2P_spine3_Ethernet5 | - | 192.168.103.17/31 | default | 1550 | False | - | - |
 
 #### Ethernet Interfaces Device Configuration
 
@@ -258,33 +252,21 @@ interface Ethernet3
    no shutdown
    mtu 1550
    no switchport
-   ip address 192.168.103.17/31
+   ip address 192.168.103.13/31
 !
 interface Ethernet4
    description P2P_spine2_Ethernet5
    no shutdown
    mtu 1550
    no switchport
-   ip address 192.168.103.19/31
+   ip address 192.168.103.15/31
 !
 interface Ethernet5
    description P2P_spine3_Ethernet5
    no shutdown
    mtu 1550
    no switchport
-   ip address 192.168.103.21/31
-!
-interface Ethernet6
-   description P2P_spine4_Ethernet5
-   no shutdown
-   mtu 1550
-   no switchport
-   ip address 192.168.103.23/31
-!
-interface Ethernet7
-   description SERVER_host3_Ethernet1
-   no shutdown
-   channel-group 7 mode active
+   ip address 192.168.103.17/31
 ```
 
 ### Port-Channel Interfaces
@@ -296,7 +278,6 @@ interface Ethernet7
 | Interface | Description | Mode | VLANs | Native VLAN | Trunk Group | LACP Fallback Timeout | LACP Fallback Mode | MLAG ID | EVPN ESI |
 | --------- | ----------- | ---- | ----- | ----------- | ------------| --------------------- | ------------------ | ------- | -------- |
 | Port-Channel1 | MLAG_leaf4_Port-Channel1 | trunk | - | - | MLAG | - | - | - | - |
-| Port-Channel7 | PortChannel host3 | access | 20 | - | - | - | - | 7 | - |
 
 #### Port-Channel Interfaces Device Configuration
 
@@ -308,15 +289,6 @@ interface Port-Channel1
    switchport mode trunk
    switchport trunk group MLAG
    switchport
-!
-interface Port-Channel7
-   description PortChannel host3
-   no shutdown
-   switchport access vlan 20
-   switchport mode access
-   switchport
-   mlag 7
-   spanning-tree portfast
 ```
 
 ### Loopback Interfaces
@@ -359,7 +331,6 @@ interface Loopback1
 | Interface | Description | VRF |  MTU | Shutdown |
 | --------- | ----------- | --- | ---- | -------- |
 | Vlan10 | DMZ | VRF_A | - | False |
-| Vlan20 | Internal | VRF_A | - | False |
 | Vlan3009 | MLAG_L3_VRF_VRF_A | VRF_A | 1550 | False |
 | Vlan4093 | MLAG_L3 | default | 1550 | False |
 | Vlan4094 | MLAG | default | 1550 | False |
@@ -369,7 +340,6 @@ interface Loopback1
 | Interface | VRF | IP Address | IP Address Virtual | IP Router Virtual Address | ACL In | ACL Out |
 | --------- | --- | ---------- | ------------------ | ------------------------- | ------ | ------- |
 | Vlan10 |  VRF_A  |  -  |  10.1.10.1/24  |  -  |  -  |  -  |
-| Vlan20 |  VRF_A  |  -  |  10.1.20.1/24  |  -  |  -  |  -  |
 | Vlan3009 |  VRF_A  |  10.255.251.4/31  |  -  |  -  |  -  |  -  |
 | Vlan4093 |  default  |  10.255.251.4/31  |  -  |  -  |  -  |  -  |
 | Vlan4094 |  default  |  10.255.252.4/31  |  -  |  -  |  -  |  -  |
@@ -383,12 +353,6 @@ interface Vlan10
    no shutdown
    vrf VRF_A
    ip address virtual 10.1.10.1/24
-!
-interface Vlan20
-   description Internal
-   no shutdown
-   vrf VRF_A
-   ip address virtual 10.1.20.1/24
 !
 interface Vlan3009
    description MLAG_L3_VRF_VRF_A
@@ -426,7 +390,6 @@ interface Vlan4094
 | VLAN | VNI | Flood List | Multicast Group |
 | ---- | --- | ---------- | --------------- |
 | 10 | 10010 | - | - |
-| 20 | 10020 | - | - |
 
 ##### VRF to VNI and Multicast Group Mappings
 
@@ -444,7 +407,6 @@ interface Vxlan1
    vxlan virtual-router encapsulation mac-address mlag-system-id
    vxlan udp-port 4789
    vxlan vlan 10 vni 10010
-   vxlan vlan 20 vni 10020
    vxlan vrf VRF_A vni 10
 ```
 
@@ -570,11 +532,9 @@ ASN Notation: asplain
 | 192.168.101.11 | 65001 | default | - | Inherited from peer group EVPN-OVERLAY-PEERS | Inherited from peer group EVPN-OVERLAY-PEERS | - | Inherited from peer group EVPN-OVERLAY-PEERS | - | - | - | - |
 | 192.168.101.12 | 65001 | default | - | Inherited from peer group EVPN-OVERLAY-PEERS | Inherited from peer group EVPN-OVERLAY-PEERS | - | Inherited from peer group EVPN-OVERLAY-PEERS | - | - | - | - |
 | 192.168.101.13 | 65001 | default | - | Inherited from peer group EVPN-OVERLAY-PEERS | Inherited from peer group EVPN-OVERLAY-PEERS | - | Inherited from peer group EVPN-OVERLAY-PEERS | - | - | - | - |
-| 192.168.101.14 | 65001 | default | - | Inherited from peer group EVPN-OVERLAY-PEERS | Inherited from peer group EVPN-OVERLAY-PEERS | - | Inherited from peer group EVPN-OVERLAY-PEERS | - | - | - | - |
+| 192.168.103.12 | 65001 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - | - | - | - |
+| 192.168.103.14 | 65001 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - | - | - | - |
 | 192.168.103.16 | 65001 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - | - | - | - |
-| 192.168.103.18 | 65001 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - | - | - | - |
-| 192.168.103.20 | 65001 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - | - | - | - |
-| 192.168.103.22 | 65001 | default | - | Inherited from peer group IPv4-UNDERLAY-PEERS | Inherited from peer group IPv4-UNDERLAY-PEERS | - | - | - | - | - | - |
 | 10.255.251.5 | Inherited from peer group MLAG-IPv4-UNDERLAY-PEER | VRF_A | - | Inherited from peer group MLAG-IPv4-UNDERLAY-PEER | Inherited from peer group MLAG-IPv4-UNDERLAY-PEER | - | - | - | - | - | - |
 
 #### Router BGP EVPN Address Family
@@ -590,7 +550,6 @@ ASN Notation: asplain
 | VLAN | Route-Distinguisher | Both Route-Target | Import Route Target | Export Route-Target | Redistribute |
 | ---- | ------------------- | ----------------- | ------------------- | ------------------- | ------------ |
 | 10 | 192.168.101.3:10010 | 10010:10010 | - | - | learned |
-| 20 | 192.168.101.3:10020 | 10020:10020 | - | - | learned |
 
 #### Router BGP VRFs
 
@@ -633,31 +592,20 @@ router bgp 65299
    neighbor 192.168.101.13 peer group EVPN-OVERLAY-PEERS
    neighbor 192.168.101.13 remote-as 65001
    neighbor 192.168.101.13 description spine3_Loopback0
-   neighbor 192.168.101.14 peer group EVPN-OVERLAY-PEERS
-   neighbor 192.168.101.14 remote-as 65001
-   neighbor 192.168.101.14 description spine4_Loopback0
+   neighbor 192.168.103.12 peer group IPv4-UNDERLAY-PEERS
+   neighbor 192.168.103.12 remote-as 65001
+   neighbor 192.168.103.12 description spine1_Ethernet5
+   neighbor 192.168.103.14 peer group IPv4-UNDERLAY-PEERS
+   neighbor 192.168.103.14 remote-as 65001
+   neighbor 192.168.103.14 description spine2_Ethernet5
    neighbor 192.168.103.16 peer group IPv4-UNDERLAY-PEERS
    neighbor 192.168.103.16 remote-as 65001
-   neighbor 192.168.103.16 description spine1_Ethernet5
-   neighbor 192.168.103.18 peer group IPv4-UNDERLAY-PEERS
-   neighbor 192.168.103.18 remote-as 65001
-   neighbor 192.168.103.18 description spine2_Ethernet5
-   neighbor 192.168.103.20 peer group IPv4-UNDERLAY-PEERS
-   neighbor 192.168.103.20 remote-as 65001
-   neighbor 192.168.103.20 description spine3_Ethernet5
-   neighbor 192.168.103.22 peer group IPv4-UNDERLAY-PEERS
-   neighbor 192.168.103.22 remote-as 65001
-   neighbor 192.168.103.22 description spine4_Ethernet5
+   neighbor 192.168.103.16 description spine3_Ethernet5
    redistribute connected route-map RM-CONN-2-BGP
    !
    vlan 10
       rd 192.168.101.3:10010
       route-target both 10010:10010
-      redistribute learned
-   !
-   vlan 20
-      rd 192.168.101.3:10020
-      route-target both 10020:10020
       redistribute learned
    !
    address-family evpn
